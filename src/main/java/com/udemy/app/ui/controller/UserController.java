@@ -1,5 +1,7 @@
 package com.udemy.app.ui.controller;
 
+import com.udemy.app.ui.model.request.UserDatailsRequestModel;
+import com.udemy.app.ui.model.response.UserRest;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -13,9 +15,9 @@ public class UserController {
     }
 
     @PostMapping
-    public String createUser()
+    public UserRest createUser(@RequestBody UserDatailsRequestModel userDetails)
     {
-        return "create user was called";
+        return null;
     }
 
     @PutMapping
