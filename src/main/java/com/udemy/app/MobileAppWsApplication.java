@@ -1,5 +1,6 @@
 package com.udemy.app;
 
+import com.udemy.app.security.AppProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -15,5 +16,15 @@ public class MobileAppWsApplication {
 	@Bean
 	public BCryptPasswordEncoder bCryptPasswordEncoder(){
 		return new BCryptPasswordEncoder();
+	}
+
+	@Bean
+	public SpringApplicationContext springApplicationContext() {
+		return new SpringApplicationContext();
+	}
+
+	@Bean
+	public AppProperties getAppProperties() {
+		return new AppProperties();
 	}
 }

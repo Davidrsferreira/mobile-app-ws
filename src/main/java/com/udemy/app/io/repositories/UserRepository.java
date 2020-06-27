@@ -1,4 +1,4 @@
-package com.udemy.app.repository;
+package com.udemy.app.io.repositories;
 
 import com.udemy.app.io.entity.UserEntity;
 import org.springframework.data.repository.CrudRepository;
