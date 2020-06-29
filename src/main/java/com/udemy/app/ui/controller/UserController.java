@@ -5,6 +5,8 @@ import com.udemy.app.service.UserService;
 import com.udemy.app.shared.dto.UserDto;
 import com.udemy.app.ui.model.request.UserDatailsRequestModel;
 import com.udemy.app.ui.model.response.ErrorMessages;
+import com.udemy.app.ui.model.response.OperationStatusModel;
+import com.udemy.app.ui.model.response.RequestOperationStatus;
 import com.udemy.app.ui.model.response.UserRest;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,15 +47,29 @@ public class UserController {
         return returnValue;
     }
 
-    @PutMapping
-    public String updateUser()
+    @PutMapping(path = "/{id}")
+    public UserRest updateUser(@PathVariable String id, @RequestBody UserDatailsRequestModel userDetails)
     {
-        return "update user was called";
+        UserRest returnValue = new UserRest();
+
+        UserDto userDto = new UserDto();
+        BeanUtils.copyProperties(userDetails, userDto);
+
+        UserDto updatedUser = userService.updateUser(id, userDto);
+        BeanUtils.copyProperties(updatedUser, returnValue);
+
+        return returnValue;
     }
 
-    @DeleteMapping
-    public String deleteUser()
+    @DeleteMapping(path = "/{id}")
+    public OperationStatusModel deleteUser(@PathVariable String id)
     {
-        return "delete user was called";
+        OperationStatusModel returnValue = new OperationStatusModel();
+
+        returnValue.setName(RequestOperationStatus.DELETE.name());
+        userService.deleteUser(id);
+        returnValue.setStatus(RequestOperationStatus.SUCCESS.name());
+
+        return returnValue;
     }
 }

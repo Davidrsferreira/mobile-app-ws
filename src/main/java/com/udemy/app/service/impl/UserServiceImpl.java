@@ -1,10 +1,13 @@
 package com.udemy.app.service.impl;
 
+import com.udemy.app.exceptions.UserServiceException;
 import com.udemy.app.io.entity.UserEntity;
 import com.udemy.app.io.repositories.UserRepository;
 import com.udemy.app.service.UserService;
 import com.udemy.app.shared.Utils;
 import com.udemy.app.shared.dto.UserDto;
+import com.udemy.app.ui.model.response.ErrorMessage;
+import com.udemy.app.ui.model.response.ErrorMessages;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
@@ -71,12 +74,44 @@ public class UserServiceImpl implements UserService {
         UserEntity userEntity = userRepository.findByUserId(id);
 
         if (userEntity == null) {
-            throw new UsernameNotFoundException(id);
+            throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
         }
 
         BeanUtils.copyProperties(userEntity, returnValue);
 
         return returnValue;
+    }
+
+    @Override
+    public UserDto updateUser(String id, UserDto userDto) {
+
+        UserDto returnValue = new UserDto();
+        UserEntity userEntity = userRepository.findByUserId(id);
+
+        if (userEntity == null) {
+            throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+        }
+
+        userEntity.setFirstName(userDto.getFirstName());
+        userEntity.setLastName(userDto.getLastName());
+
+        UserEntity updateUserDetails = userRepository.save(userEntity);
+
+        BeanUtils.copyProperties(updateUserDetails, returnValue);
+
+        return returnValue;
+    }
+
+    @Override
+    public void deleteUser(String id) {
+
+        UserEntity userEntity = userRepository.findByUserId(id);
+
+        if (userEntity == null) {
+            throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());
+        }
+
+        userRepository.delete(userEntity);
     }
 
     @Override
