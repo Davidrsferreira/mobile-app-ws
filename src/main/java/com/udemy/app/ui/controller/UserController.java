@@ -3,11 +3,12 @@ package com.udemy.app.ui.controller;
 import com.udemy.app.exceptions.UserServiceException;
 import com.udemy.app.service.UserService;
 import com.udemy.app.shared.dto.UserDto;
-import com.udemy.app.ui.model.request.UserDatailsRequestModel;
+import com.udemy.app.ui.model.request.UserDetailsRequestModel;
 import com.udemy.app.ui.model.response.ErrorMessages;
 import com.udemy.app.ui.model.response.OperationStatusModel;
 import com.udemy.app.ui.model.response.RequestOperationStatus;
 import com.udemy.app.ui.model.response.UserRest;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -34,24 +35,26 @@ public class UserController {
     }
 
     @PostMapping
-    public UserRest createUser(@RequestBody UserDatailsRequestModel userDetails) throws Exception {
+    public UserRest createUser(@RequestBody UserDetailsRequestModel userDetails) throws Exception {
         UserRest returnValue = new UserRest();
 
         if (userDetails.getEmail().isEmpty()) {
             throw new UserServiceException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
         }
 
-        UserDto userDto = new UserDto();
-        BeanUtils.copyProperties(userDetails, userDto);
+        //UserDto userDto = new UserDto();
+        //BeanUtils.copyProperties(userDetails, userDto);
+        ModelMapper modelMapper = new ModelMapper();
+        UserDto userDto = modelMapper.map(userDetails, UserDto.class);
 
         UserDto createdUser = userService.createUser(userDto);
-        BeanUtils.copyProperties(createdUser, returnValue);
+        returnValue = modelMapper.map(createdUser, UserRest.class);
 
         return returnValue;
     }
 
     @PutMapping(path = "/{id}")
-    public UserRest updateUser(@PathVariable String id, @RequestBody UserDatailsRequestModel userDetails)
+    public UserRest updateUser(@PathVariable String id, @RequestBody UserDetailsRequestModel userDetails)
     {
         UserRest returnValue = new UserRest();
 

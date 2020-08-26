@@ -16,6 +16,10 @@ public class Utils {
         return generateRamdomString(length);
     }
 
+    public String generateAddressId(int length){
+        return generateRamdomString(length);
+    }
+
     private String generateRamdomString(int length) {
 
         StringBuilder returnValue = new StringBuilder(length);
