@@ -1,18 +1,19 @@
 package com.udemy.app.ui.controller;
 
 import com.udemy.app.exceptions.UserServiceException;
+import com.udemy.app.service.AddressService;
 import com.udemy.app.service.UserService;
+import com.udemy.app.shared.dto.AddressDto;
 import com.udemy.app.shared.dto.UserDto;
 import com.udemy.app.ui.model.request.UserDetailsRequestModel;
-import com.udemy.app.ui.model.response.ErrorMessages;
-import com.udemy.app.ui.model.response.OperationStatusModel;
-import com.udemy.app.ui.model.response.RequestOperationStatus;
-import com.udemy.app.ui.model.response.UserRest;
+import com.udemy.app.ui.model.response.*;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +23,9 @@ public class UserController {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    AddressService addressService;
 
     @GetMapping(path = "/{id}")
     public UserRest getUser(@PathVariable String id)
@@ -84,15 +88,41 @@ public class UserController {
                                    @RequestParam(value = "limit", defaultValue = "25") int limit) {
 
         List<UserRest> returnValue = new ArrayList<>();
+        ModelMapper modelMapper = new ModelMapper();
 
         List<UserDto> users = userService.getUsers(page, limit);
 
         for (UserDto userDto : users) {
-            UserRest userModel = new UserRest();
-            BeanUtils.copyProperties(userDto, userModel);
-            returnValue.add(userModel);
+            returnValue.add(modelMapper.map(userDto, UserRest.class));
         }
 
         return returnValue;
+    }
+
+    @GetMapping(path = "/{id}/addresses")
+    public List<AddressRest> getUserAddresses(@PathVariable String id)
+    {
+        List<AddressRest> returnValue = new ArrayList<>();
+
+        List<AddressDto> addressDto = addressService.getAddresses(id);
+
+        if (addressDto != null && !addressDto.isEmpty())
+        {
+            Type listType = new TypeToken<List<AddressRest>>() {}.getType();
+            ModelMapper modelMapper = new ModelMapper();
+            returnValue = modelMapper.map(addressDto, listType);
+        }
+
+        return returnValue;
+    }
+
+    @GetMapping(path = "/{id}/addresses/{addressId}")
+    public AddressRest getUserAddress(@PathVariable String addressId)
+    {
+        AddressDto addressDto = addressService.getAddress(addressId);
+
+        ModelMapper modelMapper = new ModelMapper();
+
+        return modelMapper.map(addressDto, AddressRest.class);
     }
 }
